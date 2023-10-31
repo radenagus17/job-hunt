@@ -1,8 +1,8 @@
 import Navbar from "@/components/Layout/Navbar";
-import "./globals.css";
+import "../globals.css";
 import type { Metadata } from "next";
 import { Epilogue } from "next/font/google";
-import Image from "next/image";
+// import Image from "next/image";
 import Footer from "@/components/Layout/Footer";
 
 const epilogue = Epilogue({ subsets: ["latin"] });
