@@ -5,30 +5,9 @@ import { formFilterSchema } from "@/lib/form.schema";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { JobTypes, filterformType } from "@/types";
-import { CATEGORIES_OPTION } from "@/constants";
-
-const FILTER_FORMS: filterformType[] = [
-  {
-    name: "categories",
-    label: "Categories",
-    items: CATEGORIES_OPTION,
-  },
-];
-
-const Dummy_Data: JobTypes[] = [
-  {
-    applicants: 5,
-    categories: ["Marketing", "Design"],
-    desc: "lorem",
-    image: "/images/company2.png",
-    jobType: "Full-Time",
-    location: "Paris, France",
-    name: "Social Media Assistant",
-    needs: 10,
-    type: "Agency",
-  },
-];
+import useCategoryJobFilter from "@/hooks/useCategoriesJobFilter";
+import useJobs from "@/hooks/useJobs";
+import { useEffect, useState } from "react";
 
 export default function FindJobsPage() {
   const formFilter = useForm<z.infer<typeof formFilterSchema>>({
@@ -38,21 +17,30 @@ export default function FindJobsPage() {
     },
   });
 
+  const [filters] = useCategoryJobFilter();
+  const [categories, setCategories] = useState<string[]>([]);
+  const { jobs, isLoading, mutate } = useJobs(categories);
+
   const onSubmit = async (val: z.infer<typeof formFilterSchema>) => {
-    console.log(val);
+    setCategories(val.categories);
   };
+
+  useEffect(() => {
+    mutate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categories]);
 
   return (
     <>
       <ExploreDataContainer
         formFilter={formFilter}
         onSubmitFilter={onSubmit}
-        filterForm={FILTER_FORMS}
-        loading={false}
+        filterForm={filters}
+        loading={isLoading}
         title="dream job"
         subtitle="Find your next career at companies Like HubSpot, Nike, DropBox"
         type="job"
-        data={Dummy_Data}
+        data={jobs}
       />
     </>
   );

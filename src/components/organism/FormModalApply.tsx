@@ -28,20 +28,83 @@ import {
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import UploadField from "./UploadField";
+import { useSession } from "next-auth/react";
+import { useToast } from "../ui/use-toast";
+import { useRouter } from "next/navigation";
+import { supabaseUploadFile } from "@/lib/supabase";
 
-interface FormModalApplyProps {}
+interface FormModalApplyProps {
+  image: string | undefined;
+  roles: string | undefined;
+  location: string | undefined;
+  jobType: string | undefined;
+  id: string | undefined;
+}
 
 const wait = () => new Promise((resolve) => setTimeout(resolve, 1000));
 
-const FormModalApply: FC<FormModalApplyProps> = ({}) => {
+const FormModalApply: FC<FormModalApplyProps> = ({
+  image,
+  roles,
+  location,
+  jobType,
+  id,
+}) => {
   const [open, setOpen] = useState<boolean>(false);
   const form = useForm<z.infer<typeof formApplySchema>>({
     resolver: zodResolver(formApplySchema),
   });
 
-  const onSubmit = (val: z.infer<typeof formApplySchema>) => {
-    console.log(val);
-    wait().then(() => setOpen(false));
+  const { data: session } = useSession();
+  const { toast } = useToast();
+  const router = useRouter();
+
+  const onSubmit = async (val: z.infer<typeof formApplySchema>) => {
+    try {
+      const {
+        resume,
+        coverLetter,
+        linkedin,
+        phone,
+        portfolio,
+        previousJobTitle,
+      } = val;
+      const { filename, error } = await supabaseUploadFile(resume, "applicant");
+
+      const reqData = {
+        userId: session?.user.id,
+        jobId: id,
+        resume: filename,
+        coverLetter,
+        linkedin,
+        phone,
+        portfolio,
+        previousJobTitle,
+      };
+
+      console.log(coverLetter);
+      if (error) throw "error";
+
+      await fetch("/api/jobs/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(reqData),
+      });
+
+      await toast({
+        title: "Success",
+        description: "Apply job success",
+      });
+
+      wait().then(() => setOpen(false));
+      router.replace("/");
+    } catch (error) {
+      console.log(error);
+      await toast({
+        title: "Error",
+        description: "Please try again",
+      });
+    }
   };
 
   return (
@@ -55,19 +118,12 @@ const FormModalApply: FC<FormModalApplyProps> = ({}) => {
         <div>
           <div className="inline-flex items-center gap-4">
             <div>
-              <Image
-                src={"/images/company2.png"}
-                alt="/images/company2.png"
-                width={60}
-                height={60}
-              />
+              <Image src={image!!} alt={image!!} width={60} height={60} />
             </div>
             <div>
-              <div className="text-lg font-semibold">
-                Social Media Assistant
-              </div>
+              <div className="text-lg font-semibold">{roles}</div>
               <div className="text-gray-500">
-                Agency . Paris, France . Full-Time
+                {location} . {jobType}
               </div>
             </div>
           </div>

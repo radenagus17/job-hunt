@@ -7,7 +7,7 @@ export const formFilterSchema = z.object({
 });
 
 export const formFilterCompanySchema = z.object({
-  industries: z.array(z.string()),
+  industry: z.array(z.string()),
 });
 
 export const formApplySchema = z.object({

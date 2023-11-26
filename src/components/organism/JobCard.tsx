@@ -17,12 +17,13 @@ const JobCard: FC<JobCardProps> = ({
   jobType,
   type,
   needs,
-  categories,
+  skills,
+  id,
 }) => {
   const router = useRouter();
 
   return (
-    <div className="w-full border mb-5 p-6 border-border flex flex-row justify-between items-center">
+    <div className="w-full border p-6 border-border flex flex-row justify-between items-center">
       <div className="flex flex-row items-start gap-6">
         <div>
           <Image src={image} alt={image} width={64} height={64} />
@@ -35,7 +36,7 @@ const JobCard: FC<JobCardProps> = ({
           <div className="h-5 inline-flex gap-2 items-center">
             <Badge variant={"secondary"}>{jobType}</Badge>
             <Separator orientation="vertical" />
-            {categories.map((item: string, i: number) => (
+            {skills.map((item: string, i: number) => (
               <Badge key={i}>{item}</Badge>
             ))}
           </div>
@@ -43,7 +44,7 @@ const JobCard: FC<JobCardProps> = ({
       </div>
       <div className="w-[200px]">
         <Button
-          onClick={() => router.push("/detail/job/abc")}
+          onClick={() => router.push("/detail/job/" + id)}
           className="w-full"
           size={"lg"}
         >

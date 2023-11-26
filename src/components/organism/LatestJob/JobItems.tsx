@@ -7,12 +7,13 @@ import React, { FC } from "react";
 interface JobItemsProps extends JobTypes {}
 
 const JobItems: FC<JobItemsProps> = ({
-  categories,
+  category,
   jobType,
   name,
   location,
   image,
   type,
+  skills,
 }) => {
   return (
     <div className="border border-border p-8 flex flex-row items-center gap-6 cursor-pointer">
@@ -25,13 +26,13 @@ const JobItems: FC<JobItemsProps> = ({
           {type} . {location}
         </div>
         <div className="h-5 inline-flex gap-2 items-center">
-          <Badge variant={"secondary"} className="min-w-[4.7rem]">
+          <Badge variant={"secondary"} className="w-max">
             {jobType}
           </Badge>
           <Separator orientation="vertical" />
-          {categories.map((item: string, i: number) => (
+          {skills.map((item: string, i: number) => (
             <Badge
-              key={i}
+              key={item + i}
               className="rounded border-primary bg-primary/5 text-primary"
               variant={"outline"}
             >
